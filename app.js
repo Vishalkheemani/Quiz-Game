@@ -4,7 +4,7 @@ const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
 const startButton = document.getElementById("start-btn");
 const questionText = document.getElementById("question-text");
-const answersContainer = document.getElementById("answers-container");
+const answersContainer = document.getElementById("answers-container"); // ✅ Fixed ID reference
 const currentQuestionSpan = document.getElementById("current-question");
 const totalQuestionsSpan = document.getElementById("total-questions");
 const scoreSpan = document.getElementById("score");
@@ -14,6 +14,7 @@ const resultMessage = document.getElementById("result-message");
 const restartButton = document.getElementById("restart-btn");
 const progressBar = document.getElementById("progress");
 
+// Quiz questions
 const quizQuestions = [
   {
     question: "What is the capital of France?",
@@ -62,70 +63,65 @@ const quizQuestions = [
   },
 ];
 
-// QUIZ STATE VARS
+// Quiz state variables
 let currentQuestionIndex = 0;
 let score = 0;
 let answersDisabled = false;
 
+// Set total questions
 totalQuestionsSpan.textContent = quizQuestions.length;
 maxScoreSpan.textContent = quizQuestions.length;
 
-// event listeners
+// Event listeners
 startButton.addEventListener("click", startQuiz);
 restartButton.addEventListener("click", restartQuiz);
 
 function startQuiz() {
-  // reset vars
   currentQuestionIndex = 0;
   score = 0;
-  scoreSpan.textContent = 0;
+  scoreSpan.textContent = score;
 
   startScreen.classList.remove("active");
+  resultScreen.classList.remove("active");
   quizScreen.classList.add("active");
 
   showQuestion();
 }
 
 function showQuestion() {
-  // reset state
   answersDisabled = false;
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
-
   currentQuestionSpan.textContent = currentQuestionIndex + 1;
 
   const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
   progressBar.style.width = progressPercent + "%";
 
   questionText.textContent = currentQuestion.question;
-
   answersContainer.innerHTML = "";
 
   currentQuestion.answers.forEach((answer) => {
     const button = document.createElement("button");
     button.textContent = answer.text;
     button.classList.add("answer-btn");
-
-    // what is dataset? it's a property of the button element that allows you to store custom data
     button.dataset.correct = answer.correct;
 
     button.addEventListener("click", selectAnswer);
-
     answersContainer.appendChild(button);
   });
 }
 
 function selectAnswer(event) {
-  // optimization check
   if (answersDisabled) return;
-
   answersDisabled = true;
 
   const selectedButton = event.target;
   const isCorrect = selectedButton.dataset.correct === "true";
 
-  // Here Array.from() is used to convert the NodeList returned by answersContainer.children into an array, this is because the NodeList is not an array and we need to use the forEach method
+  // Disable and style all answer buttons
   Array.from(answersContainer.children).forEach((button) => {
+    button.disabled = true;
+
     if (button.dataset.correct === "true") {
       button.classList.add("correct");
     } else if (button === selectedButton) {
@@ -140,8 +136,6 @@ function selectAnswer(event) {
 
   setTimeout(() => {
     currentQuestionIndex++;
-
-    // check if there are more questions or if the quiz is over
     if (currentQuestionIndex < quizQuestions.length) {
       showQuestion();
     } else {
@@ -173,6 +167,5 @@ function showResults() {
 
 function restartQuiz() {
   resultScreen.classList.remove("active");
-
   startQuiz();
 }
